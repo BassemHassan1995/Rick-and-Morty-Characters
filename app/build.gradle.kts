@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "bassem.task.charactersapplication"
+    namespace = "bassem.task.characters"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "bassem.task.charactersapplication"
+        applicationId = "bassem.task.characters"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

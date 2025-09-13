@@ -1,4 +1,4 @@
-package bassem.task.charactersapplication
+package bassem.task.characters
 
 import org.junit.Test
 

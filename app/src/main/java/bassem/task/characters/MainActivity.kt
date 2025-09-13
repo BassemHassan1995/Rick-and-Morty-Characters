@@ -1,4 +1,4 @@
-package bassem.task.charactersapplication
+package bassem.task.characters
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,7 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import bassem.task.charactersapplication.ui.theme.CharactersApplicationTheme
+import bassem.task.characters.ui.theme.CharactersApplicationTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
