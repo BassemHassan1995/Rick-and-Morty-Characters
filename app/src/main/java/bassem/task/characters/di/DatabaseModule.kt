@@ -26,5 +26,6 @@ object DatabaseModule {
         ).fallbackToDestructiveMigration(false).build()
 
     @Provides
+    @Singleton
     fun provideCharacterDao(db: AppDatabase): CharacterDao = db.characterDao()
 }

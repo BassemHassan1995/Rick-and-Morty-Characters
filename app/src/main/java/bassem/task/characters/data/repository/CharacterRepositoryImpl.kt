@@ -9,8 +9,9 @@ import bassem.task.characters.data.mapper.toEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.first
+import javax.inject.Inject
 
-class CharacterRepositoryImpl(
+class CharacterRepositoryImpl @Inject constructor(
     private val api: CharacterApiService,
     private val dao: CharacterDao
 ) : CharacterRepository {
