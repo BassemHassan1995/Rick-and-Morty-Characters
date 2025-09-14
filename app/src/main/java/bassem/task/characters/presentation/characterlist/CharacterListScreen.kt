@@ -26,6 +26,7 @@ import bassem.task.characters.domain.model.Character
 import bassem.task.characters.ui.components.ErrorView
 import bassem.task.characters.ui.components.LoadingView
 import bassem.task.characters.ui.components.EmptyView
+import bassem.task.characters.ui.components.BaseScaffold
 import bassem.task.characters.presentation.base.ResultState
 import coil.compose.rememberAsyncImagePainter
 
@@ -52,7 +53,10 @@ fun CharacterListScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    BaseScaffold(
+        title = "Characters",
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ) { paddingValues ->
         when (val result = state.charactersState) {
             is ResultState.Loading -> LoadingView()
             is ResultState.Error -> ErrorView(message = result.message)
@@ -65,33 +69,30 @@ fun CharacterListScreen(
                         onAction = { viewModel.onEvent(CharacterListEvent.LoadInitial) }
                     )
                 } else {
-                    CharactersList(
+                    CharactersListContent(
                         characters = characters,
                         onCharacterClick = { id ->
                             viewModel.onEvent(CharacterListEvent.OnCharacterClicked(id))
                         },
                         onLoadMore = { viewModel.onEvent(CharacterListEvent.LoadNextPage) },
-                        endReached = state.endReached
+                        endReached = state.endReached,
+                        modifier = Modifier.padding(paddingValues)
                     )
                 }
             }
 
             is ResultState.Idle -> {}
         }
-
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
     }
 }
 
 @Composable
-fun CharactersList(
+fun CharactersListContent(
     characters: List<Character>,
     onCharacterClick: (Int) -> Unit,
     onLoadMore: () -> Unit,
-    endReached: Boolean
+    endReached: Boolean,
+    modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
 
@@ -129,7 +130,7 @@ fun CharactersList(
 
     LazyColumn(
         state = listState,
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
