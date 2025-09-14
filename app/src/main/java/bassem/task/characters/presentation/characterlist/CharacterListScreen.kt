@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
@@ -19,9 +22,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import bassem.task.characters.R
 import bassem.task.characters.domain.model.Character
 import bassem.task.characters.ui.components.ErrorView
 import bassem.task.characters.ui.components.LoadingView
@@ -54,7 +61,7 @@ fun CharacterListScreen(
     }
 
     BaseScaffold(
-        title = "Characters",
+        title = stringResource(R.string.characters_title),
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
         when (val result = state.charactersState) {
@@ -64,8 +71,8 @@ fun CharacterListScreen(
                 val characters = result.data
                 if (characters.isEmpty()) {
                     EmptyView(
-                        title = "No characters found.",
-                        description = "Try again later or check your connection.",
+                        title = stringResource(R.string.no_characters_found),
+                        description = stringResource(R.string.try_again_later),
                         onAction = { viewModel.onEvent(CharacterListEvent.LoadInitial) }
                     )
                 } else {
@@ -162,25 +169,53 @@ fun CharacterItem(
     character: Character,
     onCharacterClick: (Int) -> Unit
 ) {
-    Row(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onCharacterClick(character.id) }
-            .padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Image(
-            painter = rememberAsyncImagePainter(model = character.image),
-            contentDescription = character.name,
-            modifier = Modifier.size(64.dp),
-            contentScale = ContentScale.Crop
+            .clickable { onCharacterClick(character.id) },
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
         )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Character Image with rounded corners
+            Image(
+                painter = rememberAsyncImagePainter(model = character.image),
+                contentDescription = character.name,
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
+            )
 
-        Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
-        Column {
-            Text(text = character.name, style = MaterialTheme.typography.titleMedium)
-            Text(text = character.species, style = MaterialTheme.typography.bodyMedium)
+            // Character Details
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = character.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = character.species,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }

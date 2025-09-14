@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name">Characters Application</string>
+    <string name="character_status_alive">Alive</string>
+    <string name="character_status_dead">Dead</string>
+    <string name="character_status_unknown">Unknown</string>
+    <string name="characters_title">Characters</string>
+    <string name="character_details_title">Character Details</string>
+
+    <!-- CommonViews strings -->
+    <string name="error_content_description">Error</string>
+    <string name="error_title">Oops! Something went wrong</string>
+    <string name="try_again_button">Try Again</string>
+    <string name="empty_content_description">Empty</string>
+    <string name="empty_default_title">No Data Found</string>
+    <string name="empty_default_description">There\'s nothing to show here yet.</string>
+    <string name="refresh_button">Refresh</string>
+
+    <!-- BaseScaffold strings -->
+    <string name="action_back">Back</string>
+
+    <!-- CharacterListScreen strings -->
+    <string name="no_characters_found">No characters found.</string>
+    <string name="try_again_later">Try again later or check your connection.</string>
 </resources>

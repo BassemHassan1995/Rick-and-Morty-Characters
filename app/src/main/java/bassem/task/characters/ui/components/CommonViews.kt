@@ -19,8 +19,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import bassem.task.characters.R
 
 @Composable
 fun LoadingView() {
@@ -48,7 +50,7 @@ fun ErrorView(
         ) {
             Icon(
                 imageVector = Icons.Default.Warning,
-                contentDescription = "Error",
+                contentDescription = stringResource(R.string.error_content_description),
                 tint = MaterialTheme.colorScheme.error,
                 modifier = Modifier.size(72.dp)
             )
@@ -56,7 +58,7 @@ fun ErrorView(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Oops! Something went wrong",
+                text = stringResource(R.string.error_title),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center
@@ -78,7 +80,7 @@ fun ErrorView(
                     onClick = onRetry,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 ) {
-                    Text(text = "Try Again")
+                    Text(text = stringResource(R.string.try_again_button))
                 }
             }
         }
@@ -87,10 +89,10 @@ fun ErrorView(
 
 @Composable
 fun EmptyView(
-    title: String = "No Data Found",
-    description: String = "There's nothing to show here yet.",
+    title: String = stringResource(R.string.empty_default_title),
+    description: String = stringResource(R.string.empty_default_description),
     onAction: (() -> Unit)? = null,
-    actionText: String = "Refresh"
+    actionText: String = stringResource(R.string.refresh_button)
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -103,7 +105,7 @@ fun EmptyView(
         ) {
             Icon(
                 imageVector = Icons.Default.Info,
-                contentDescription = "Empty",
+                contentDescription = stringResource(R.string.empty_content_description),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(80.dp)
             )
