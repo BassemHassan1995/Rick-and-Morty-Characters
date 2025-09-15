@@ -21,4 +21,6 @@
     <!-- CharacterListScreen strings -->
     <string name="no_characters_found">No characters found.</string>
     <string name="try_again_later">Try again later or check your connection.</string>
+    <string name="unknown_error">Unknown error occurred</string>
+    <string name="error_loading_more">Error loading more characters</string>
 </resources>

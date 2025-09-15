@@ -59,6 +59,7 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
+    implementation(libs.room.paging)
     ksp(libs.room.compiler)
     implementation(libs.retrofit)
     implementation(libs.okhttp.logging.interceptor)

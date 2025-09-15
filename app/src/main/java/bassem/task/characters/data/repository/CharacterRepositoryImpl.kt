@@ -1,55 +1,68 @@
 package bassem.task.characters.data.repository
 
-import bassem.task.characters.data.local.dao.CharacterDao
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
+import bassem.task.characters.data.local.AppDatabase
+import bassem.task.characters.data.mapper.toDomain
+import bassem.task.characters.data.mapper.toEntity
+import bassem.task.characters.data.mediator.CharacterRemoteMediator
 import bassem.task.characters.data.remote.api.CharacterApiService
 import bassem.task.characters.domain.model.Character
 import bassem.task.characters.domain.repository.CharacterRepository
-import bassem.task.characters.data.mapper.toDomain
-import bassem.task.characters.data.mapper.toEntity
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+@OptIn(ExperimentalPagingApi::class)
 class CharacterRepositoryImpl @Inject constructor(
     private val api: CharacterApiService,
-    private val dao: CharacterDao
+    private val database: AppDatabase,
 ) : CharacterRepository {
 
-    override fun getCharacters(page: Int): Flow<List<Character>> = flow {
-        // Emit cached data first if available
-        val cachedCharacters = dao.getCharactersByPage(page).first()
-        if (cachedCharacters.isNotEmpty()) {
-            emit(cachedCharacters.map { it.toDomain() })
-        }
+    override fun getCharacters(): Flow<PagingData<Character>> {
+        val pagingSourceFactory = { database.characterDao().getCharacters() }
 
-        // Fetch from API and update cache
-        try {
-            val response = api.getCharacters(page)
-            val characters = response.results.map { it.toDomain() }
-
-            // Cache the characters with page info
-            dao.insertCharacters(response.results.map { it.toEntity(page) })
-
-            emit(characters)
-        } catch (e: Exception) {
-            // If API fails and no cache, throw error
-            if (cachedCharacters.isEmpty()) {
-                throw e
+        return Pager(
+            config = PagingConfig(pageSize = 20, enablePlaceholders = false),
+            remoteMediator = CharacterRemoteMediator(api, database),
+            pagingSourceFactory = pagingSourceFactory
+        ).flow
+            .map { pagingData ->
+                pagingData.map { entity -> entity.toDomain() }
             }
-        }
     }
 
     override suspend fun getCharacterById(id: Int): Character? {
-        // First try to get from cache
-        return try {
-            dao.getCharacterById(id)?.toDomain()
-        } catch (e: Exception) {
-            // If cache fails, try API
+        // Use IO dispatcher for database operations to avoid main thread blocking
+        return withContext(Dispatchers.IO) {
             try {
-                api.getCharacterById(id).toDomain()
-            } catch (apiException: Exception) {
-                null
+                // First try to get from database cache
+                val cachedCharacter = database.characterDao().getCharacterById(id)
+                if (cachedCharacter != null) {
+                    return@withContext cachedCharacter.toDomain()
+                }
+
+                // If not found in cache, fetch from API
+                try {
+                    val apiCharacter = api.getCharacterById(id)
+                    // Cache the API result in database for future use
+                    database.characterDao().insertCharacter(apiCharacter.toEntity(page = 1))
+                    apiCharacter.toDomain()
+                } catch (apiException: Exception) {
+                    null
+                }
+            } catch (e: Exception) {
+                // If database fails completely, try API as fallback
+                try {
+                    api.getCharacterById(id).toDomain()
+                } catch (apiException: Exception) {
+                    null
+                }
             }
         }
     }

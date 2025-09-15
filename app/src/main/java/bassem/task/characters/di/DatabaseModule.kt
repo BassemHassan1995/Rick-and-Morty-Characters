@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.room.Room
 import bassem.task.characters.data.local.AppDatabase
 import bassem.task.characters.data.local.dao.CharacterDao
+import bassem.task.characters.data.local.dao.RemoteKeysDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,4 +29,8 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideCharacterDao(db: AppDatabase): CharacterDao = db.characterDao()
+
+    @Provides
+    @Singleton
+    fun provideRemoteKeysDao(db: AppDatabase): RemoteKeysDao = db.remoteKeysDao()
 }
