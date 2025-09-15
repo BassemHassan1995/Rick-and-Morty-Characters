@@ -81,35 +81,40 @@ fun CharacterListScreen(
                 modifier = Modifier.padding(8.dp)
             )
             Spacer(modifier = Modifier.height(8.dp))
-            when (characters.loadState.refresh) {
+            when (val loadState = characters.loadState.refresh) {
                 is LoadState.Loading -> {
                     LoadingView()
                 }
 
                 is LoadState.Error -> {
-                    val error = characters.loadState.refresh as LoadState.Error
                     ErrorView(
-                        message = error.error.message ?: stringResource(R.string.unknown_error),
+                        message = loadState.error.message ?: stringResource(R.string.unknown_error),
                         onRetry = { characters.refresh() }
                     )
                 }
 
                 is LoadState.NotLoading -> {
                     if (characters.itemCount == 0) {
-                        val title = if (state.isSearching()) {
-                            stringResource(R.string.no_search_results)
-                        } else {
-                            stringResource(R.string.no_characters_found)
+                        // For search queries, show empty state immediately when no results
+                        // For initial load, only show empty state after pagination is complete
+                        val shouldShowEmptyView = state.isSearching() || loadState.endOfPaginationReached
+
+                        if (shouldShowEmptyView) {
+                            val title = if (state.isSearching()) {
+                                stringResource(R.string.no_search_results)
+                            } else {
+                                stringResource(R.string.no_characters_found)
+                            }
+                            val description = if (state.isSearching()) {
+                                stringResource(R.string.try_different_search)
+                            } else {
+                                stringResource(R.string.try_again_later)
+                            }
+                            EmptyView(
+                                title = title,
+                                description = description,
+                            )
                         }
-                        val description = if (state.isSearching()) {
-                            stringResource(R.string.try_different_search)
-                        } else {
-                            stringResource(R.string.try_again_later)
-                        }
-                        EmptyView(
-                            title = title,
-                            description = description,
-                        )
                     } else {
                         CharactersListContent(
                             characters = characters,
