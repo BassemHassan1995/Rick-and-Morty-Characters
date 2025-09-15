@@ -1,14 +1,19 @@
 package bassem.task.characters.presentation.characterlist
 
-import bassem.task.characters.domain.usecase.GetCharactersUseCase
-import bassem.task.characters.presentation.base.BaseViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import bassem.task.characters.domain.model.Character
-import bassem.task.characters.presentation.characterlist.CharacterListEffect.*
+import bassem.task.characters.domain.usecase.GetCharactersUseCase
+import bassem.task.characters.presentation.base.BaseViewModel
+import bassem.task.characters.presentation.characterlist.CharacterListEffect.NavigateToCharacterDetail
+import bassem.task.characters.presentation.characterlist.CharacterListEffect.ShowError
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,8 +23,14 @@ class CharacterListViewModel @Inject constructor(
 ) : BaseViewModel<CharacterListEvent, CharacterListState, CharacterListEffect>(
     CharacterListState()
 ) {
+    private val searchQueryFlow = MutableStateFlow("")
 
-    val characters: Flow<PagingData<Character>> = getCharactersUseCase()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val characters: Flow<PagingData<Character>> = searchQueryFlow
+        .debounce(400)
+        .flatMapLatest { query ->
+            getCharactersUseCase(query.ifBlank { null })
+        }
         .cachedIn(viewModelScope)
 
     init {
@@ -31,6 +42,10 @@ class CharacterListViewModel @Inject constructor(
             is CharacterListEvent.LoadInitial -> loadCharacters()
             is CharacterListEvent.OnCharacterClicked ->
                 sendEffect { NavigateToCharacterDetail(event.id) }
+            is CharacterListEvent.OnSearchQueryChanged -> {
+                setState { copy(searchQuery = event.query) }
+                searchQueryFlow.value = event.query
+            }
         }
     }
 

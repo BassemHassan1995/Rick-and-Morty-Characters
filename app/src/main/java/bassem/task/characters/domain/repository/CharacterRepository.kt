@@ -6,7 +6,7 @@ import bassem.task.characters.domain.model.Character
 
 interface CharacterRepository {
 
-    fun getCharacters(): Flow<PagingData<Character>>
+    fun getCharacters(name: String? = null): Flow<PagingData<Character>>
 
     suspend fun getCharacterById(id: Int): Character?
 }

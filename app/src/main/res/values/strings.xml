@@ -23,4 +23,11 @@
     <string name="try_again_later">Try again later or check your connection.</string>
     <string name="unknown_error">Unknown error occurred</string>
     <string name="error_loading_more">Error loading more characters</string>
+
+    <!-- Search strings -->
+    <string name="search_characters_placeholder">Search characters…</string>
+    <string name="no_search_results">No characters found</string>
+    <string name="try_different_search">Try a different search term</string>
+    <string name="clear_search">Clear search</string>
+    <string name="search">Search</string>
 </resources>

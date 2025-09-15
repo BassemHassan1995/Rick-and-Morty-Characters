@@ -9,6 +9,7 @@ import bassem.task.characters.data.local.dao.CharacterDao
 import bassem.task.characters.data.mapper.toDomain
 import bassem.task.characters.data.mediator.CharacterRemoteMediator
 import bassem.task.characters.data.remote.api.CharacterApiService
+import bassem.task.characters.data.remote.paging.CharacterSearchPagingSource
 import bassem.task.characters.domain.model.Character
 import bassem.task.characters.domain.repository.CharacterRepository
 import kotlinx.coroutines.flow.Flow
@@ -22,17 +23,23 @@ class CharacterRepositoryImpl @Inject constructor(
     private val remoteMediator: CharacterRemoteMediator
 ) : CharacterRepository {
 
-    override fun getCharacters(): Flow<PagingData<Character>> {
-        val pagingSourceFactory = { dao.getCharacters() }
-
-        return Pager(
-            config = PagingConfig(pageSize = 20, enablePlaceholders = false),
-            remoteMediator = remoteMediator,
-            pagingSourceFactory = pagingSourceFactory
-        ).flow
-            .map { pagingData ->
-                pagingData.map { entity -> entity.toDomain() }
-            }
+    override fun getCharacters(name: String?): Flow<PagingData<Character>> {
+        return if (name.isNullOrBlank()) {
+            val pagingSourceFactory = { dao.getCharacters() }
+            Pager(
+                config = PagingConfig(pageSize = 20, enablePlaceholders = false),
+                remoteMediator = remoteMediator,
+                pagingSourceFactory = pagingSourceFactory
+            ).flow
+                .map { pagingData ->
+                    pagingData.map { entity -> entity.toDomain() }
+                }
+        } else {
+            Pager(
+                config = PagingConfig(pageSize = 20, enablePlaceholders = false),
+                pagingSourceFactory = { CharacterSearchPagingSource(api, name) }
+            ).flow
+        }
     }
 
     override suspend fun getCharacterById(id: Int): Character? {

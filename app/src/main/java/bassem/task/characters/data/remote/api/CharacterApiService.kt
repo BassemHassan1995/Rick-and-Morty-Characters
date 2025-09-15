@@ -8,10 +8,11 @@ import retrofit2.http.Query
 
 interface CharacterApiService {
 
-    // Fetch characters with pagination
+    // Fetch characters with pagination and optional name search
     @GET("character")
     suspend fun getCharacters(
-        @Query("page") page: Int = 1
+        @Query("page") page: Int = 1,
+        @Query("name") name: String? = null
     ): CharacterResponseDto
 
     // Fetch a single character by ID

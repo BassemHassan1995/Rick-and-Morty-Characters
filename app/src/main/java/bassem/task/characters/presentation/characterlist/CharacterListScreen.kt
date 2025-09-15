@@ -34,6 +34,7 @@ import bassem.task.characters.ui.components.ErrorView
 import bassem.task.characters.ui.components.LoadingView
 import bassem.task.characters.ui.components.EmptyView
 import bassem.task.characters.ui.components.BaseScaffold
+import bassem.task.characters.ui.components.SearchBar
 import coil.compose.rememberAsyncImagePainter
 
 @Composable
@@ -64,34 +65,56 @@ fun CharacterListScreen(
         title = stringResource(R.string.characters_title),
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
-        when (characters.loadState.refresh) {
-            is LoadState.Loading -> {
-                if (state.isLoading) {
-                    LoadingView()
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)) {
+            SearchBar(
+                query = state.searchQuery,
+                onQueryChange = { query ->
+                    viewModel.onEvent(CharacterListEvent.OnSearchQueryChanged(query))
+                },
+                onClearClick = {
+                    viewModel.onEvent(CharacterListEvent.OnSearchQueryChanged(""))
+                },
+                modifier = Modifier.padding(8.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            when (characters.loadState.refresh) {
+                is LoadState.Loading -> {
+                    if (state.isLoading) {
+                        LoadingView()
+                    }
                 }
-            }
-            is LoadState.Error -> {
-                val error = characters.loadState.refresh as LoadState.Error
-                ErrorView(
-                    message = error.error.message ?: stringResource(R.string.unknown_error),
-                    onRetry = { characters.refresh() }
-                )
-            }
-            is LoadState.NotLoading -> {
-                if (characters.itemCount == 0) {
-                    EmptyView(
-                        title = stringResource(R.string.no_characters_found),
-                        description = stringResource(R.string.try_again_later),
-                        onAction = { characters.refresh() }
+                is LoadState.Error -> {
+                    val error = characters.loadState.refresh as LoadState.Error
+                    ErrorView(
+                        message = error.error.message ?: stringResource(R.string.unknown_error),
+                        onRetry = { characters.refresh() }
                     )
-                } else {
-                    CharactersListContent(
-                        characters = characters,
-                        onCharacterClick = { id ->
-                            viewModel.onEvent(CharacterListEvent.OnCharacterClicked(id))
-                        },
-                        modifier = Modifier.padding(paddingValues)
-                    )
+                }
+                is LoadState.NotLoading -> {
+                    if (characters.itemCount == 0) {
+                        val isSearching = state.isSearching()
+                        EmptyView(
+                            title = stringResource(
+                                if (isSearching) R.string.no_search_results
+                                else R.string.no_characters_found
+                            ),
+                            description = stringResource(
+                                if (isSearching) R.string.try_different_search
+                                else R.string.try_again_later
+                            ),
+                            onAction = { characters.refresh() }
+                        )
+                    } else {
+                        CharactersListContent(
+                            characters = characters,
+                            onCharacterClick = { id ->
+                                viewModel.onEvent(CharacterListEvent.OnCharacterClicked(id))
+                            },
+                            modifier = Modifier
+                        )
+                    }
                 }
             }
         }
