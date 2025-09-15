@@ -26,8 +26,8 @@
 
     <!-- Search strings -->
     <string name="search_characters_placeholder">Search characters…</string>
-    <string name="no_search_results">No characters found</string>
-    <string name="try_different_search">Try a different search term</string>
+    <string name="no_search_results">No characters found for this name</string>
+    <string name="try_different_search">Try a different name</string>
     <string name="clear_search">Clear search</string>
     <string name="search">Search</string>
 </resources>

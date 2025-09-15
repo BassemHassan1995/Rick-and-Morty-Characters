@@ -65,9 +65,11 @@ fun CharacterListScreen(
         title = stringResource(R.string.characters_title),
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
             SearchBar(
                 query = state.searchQuery,
                 onQueryChange = { query ->
@@ -83,6 +85,7 @@ fun CharacterListScreen(
                 is LoadState.Loading -> {
                     LoadingView()
                 }
+
                 is LoadState.Error -> {
                     val error = characters.loadState.refresh as LoadState.Error
                     ErrorView(
@@ -90,12 +93,22 @@ fun CharacterListScreen(
                         onRetry = { characters.refresh() }
                     )
                 }
+
                 is LoadState.NotLoading -> {
                     if (characters.itemCount == 0) {
+                        val title = if (state.isSearching()) {
+                            stringResource(R.string.no_search_results)
+                        } else {
+                            stringResource(R.string.no_characters_found)
+                        }
+                        val description = if (state.isSearching()) {
+                            stringResource(R.string.try_different_search)
+                        } else {
+                            stringResource(R.string.try_again_later)
+                        }
                         EmptyView(
-                            title = stringResource(R.string.no_characters_found),
-                            description = stringResource(R.string.try_again_later),
-                            onAction = { characters.refresh() }
+                            title = title,
+                            description = description,
                         )
                     } else {
                         CharactersListContent(
@@ -147,6 +160,7 @@ fun CharactersListContent(
                     }
                 }
             }
+
             is LoadState.Error -> {
                 item {
                     Box(
@@ -162,7 +176,9 @@ fun CharactersListContent(
                     }
                 }
             }
-            is LoadState.NotLoading -> { /* No additional UI needed */ }
+
+            is LoadState.NotLoading -> { /* No additional UI needed */
+            }
         }
     }
 }

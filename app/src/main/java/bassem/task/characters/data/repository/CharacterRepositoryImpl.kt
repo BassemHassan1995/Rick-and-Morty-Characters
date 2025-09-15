@@ -23,11 +23,22 @@ class CharacterRepositoryImpl @Inject constructor(
     private val remoteMediator: CharacterRemoteMediator
 ) : CharacterRepository {
 
+    companion object {
+        private const val PAGE_SIZE = 20
+        private const val PREFETCH_DISTANCE = 5
+        private const val INITIAL_LOAD_SIZE = 40
+    }
+
     override fun getCharacters(name: String?): Flow<PagingData<Character>> {
         return if (name.isNullOrBlank()) {
             val pagingSourceFactory = { dao.getCharacters() }
             Pager(
-                config = PagingConfig(pageSize = 20, enablePlaceholders = false),
+                config = PagingConfig(
+                    pageSize = PAGE_SIZE,
+                    enablePlaceholders = false,
+                    prefetchDistance = PREFETCH_DISTANCE,
+                    initialLoadSize = INITIAL_LOAD_SIZE
+                ),
                 remoteMediator = remoteMediator,
                 pagingSourceFactory = pagingSourceFactory
             ).flow
@@ -36,7 +47,12 @@ class CharacterRepositoryImpl @Inject constructor(
                 }
         } else {
             Pager(
-                config = PagingConfig(pageSize = 20, enablePlaceholders = false),
+                config = PagingConfig(
+                    pageSize = PAGE_SIZE,
+                    enablePlaceholders = false,
+                    prefetchDistance = PREFETCH_DISTANCE,
+                    initialLoadSize = INITIAL_LOAD_SIZE
+                ),
                 pagingSourceFactory = { CharacterSearchPagingSource(api, name) }
             ).flow
         }
