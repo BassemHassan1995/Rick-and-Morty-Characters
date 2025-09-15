@@ -81,9 +81,7 @@ fun CharacterListScreen(
             Spacer(modifier = Modifier.height(8.dp))
             when (characters.loadState.refresh) {
                 is LoadState.Loading -> {
-                    if (state.isLoading) {
-                        LoadingView()
-                    }
+                    LoadingView()
                 }
                 is LoadState.Error -> {
                     val error = characters.loadState.refresh as LoadState.Error
@@ -94,16 +92,9 @@ fun CharacterListScreen(
                 }
                 is LoadState.NotLoading -> {
                     if (characters.itemCount == 0) {
-                        val isSearching = state.isSearching()
                         EmptyView(
-                            title = stringResource(
-                                if (isSearching) R.string.no_search_results
-                                else R.string.no_characters_found
-                            ),
-                            description = stringResource(
-                                if (isSearching) R.string.try_different_search
-                                else R.string.try_again_later
-                            ),
+                            title = stringResource(R.string.no_characters_found),
+                            description = stringResource(R.string.try_again_later),
                             onAction = { characters.refresh() }
                         )
                     } else {

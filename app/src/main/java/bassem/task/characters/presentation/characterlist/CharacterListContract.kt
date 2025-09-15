@@ -6,15 +6,13 @@ import bassem.task.characters.presentation.base.ViewState
 
 // ---------- State ----------
 data class CharacterListState(
-    val isLoading: Boolean = false,
-    val searchQuery: String = ""
+    val searchQuery: String = "",
 ) : ViewState {
     fun isSearching() = searchQuery.isNotBlank()
 }
 
 // ---------- Events ----------
 sealed interface CharacterListEvent : ViewEvent {
-    object LoadInitial : CharacterListEvent
     data class OnCharacterClicked(val id: Int) : CharacterListEvent
     data class OnSearchQueryChanged(val query: String) : CharacterListEvent
 }
