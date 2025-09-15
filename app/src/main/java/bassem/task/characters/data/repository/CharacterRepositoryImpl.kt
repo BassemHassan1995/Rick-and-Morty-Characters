@@ -27,18 +27,20 @@ class CharacterRepositoryImpl @Inject constructor(
         private const val PAGE_SIZE = 20
         private const val PREFETCH_DISTANCE = 5
         private const val INITIAL_LOAD_SIZE = 40
+
+        val pagingConfig = PagingConfig(
+            pageSize = PAGE_SIZE,
+            enablePlaceholders = false,
+            prefetchDistance = PREFETCH_DISTANCE,
+            initialLoadSize = INITIAL_LOAD_SIZE
+        )
     }
 
     override fun getCharacters(name: String?): Flow<PagingData<Character>> {
         return if (name.isNullOrBlank()) {
             val pagingSourceFactory = { dao.getCharacters() }
             Pager(
-                config = PagingConfig(
-                    pageSize = PAGE_SIZE,
-                    enablePlaceholders = false,
-                    prefetchDistance = PREFETCH_DISTANCE,
-                    initialLoadSize = INITIAL_LOAD_SIZE
-                ),
+                config = pagingConfig,
                 remoteMediator = remoteMediator,
                 pagingSourceFactory = pagingSourceFactory
             ).flow
@@ -46,22 +48,23 @@ class CharacterRepositoryImpl @Inject constructor(
                     pagingData.map { entity -> entity.toDomain() }
                 }
         } else {
+            val pagingSourceFactory = { CharacterSearchPagingSource(api, name) }
             Pager(
-                config = PagingConfig(
-                    pageSize = PAGE_SIZE,
-                    enablePlaceholders = false,
-                    prefetchDistance = PREFETCH_DISTANCE,
-                    initialLoadSize = INITIAL_LOAD_SIZE
-                ),
-                pagingSourceFactory = { CharacterSearchPagingSource(api, name) }
+                config = pagingConfig,
+                pagingSourceFactory = pagingSourceFactory
             ).flow
+                .map { pagingData ->
+                    pagingData.map { dto -> dto.toDomain() }
+                }
         }
     }
 
     override suspend fun getCharacterById(id: Int): Character? {
         // First try to get from cache
         return try {
-            dao.getCharacterById(id)?.toDomain()
+            val character = dao.getCharacterById(id)
+            character?.toDomain() ?: // If not in cache, try API
+            api.getCharacterById(id).toDomain()
         } catch (e: Exception) {
             // If cache fails, try API
             try {

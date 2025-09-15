@@ -3,26 +3,25 @@ package bassem.task.characters.data.remote.paging
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import bassem.task.characters.data.remote.api.CharacterApiService
-import bassem.task.characters.domain.model.Character
-import bassem.task.characters.data.mapper.toDomain
+import bassem.task.characters.data.remote.dto.CharacterDto
 import retrofit2.HttpException
 import javax.inject.Inject
 
 class CharacterSearchPagingSource @Inject constructor(
     private val api: CharacterApiService,
     private val name: String
-) : PagingSource<Int, Character>() {
+) : PagingSource<Int, CharacterDto>() {
 
     companion object {
         private const val STARTING_PAGE_INDEX = 1
     }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Character> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, CharacterDto> {
         val page = params.key ?: STARTING_PAGE_INDEX
 
         return try {
             val response = api.getCharacters(page = page, name = name)
-            val characters = response.results.map { it.toDomain() }
+            val characters = response.results
             val nextKey = if (response.info.next != null) page + 1 else null
             val prevKey = if (page > STARTING_PAGE_INDEX) page - 1 else null
             LoadResult.Page(
@@ -46,7 +45,7 @@ class CharacterSearchPagingSource @Inject constructor(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, Character>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, CharacterDto>): Int? {
         // Try to find the page key of the closest loaded page to the anchor position
         return state.anchorPosition?.let { anchorPosition ->
             val anchorPage = state.closestPageToPosition(anchorPosition)
