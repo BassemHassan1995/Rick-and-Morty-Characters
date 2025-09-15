@@ -11,9 +11,10 @@ import bassem.task.characters.data.local.entity.CharacterEntity
 import bassem.task.characters.data.local.entity.RemoteKeyEntity
 import bassem.task.characters.data.mapper.toEntity
 import bassem.task.characters.data.remote.api.CharacterApiService
+import javax.inject.Inject
 
 @OptIn(ExperimentalPagingApi::class)
-class CharacterRemoteMediator(
+class CharacterRemoteMediator @Inject constructor(
     private val api: CharacterApiService,
     private val database: AppDatabase
 ) : RemoteMediator<Int, CharacterEntity>() {
