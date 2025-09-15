@@ -62,7 +62,7 @@ fun CharacterDetailsScreen(
         when (val result = state.characterDetailState) {
             is ResultState.Loading -> LoadingView()
             is ResultState.Error -> ErrorView(
-                message = result.message,
+                message = result.message ?: stringResource(id = R.string.character_not_found),
                 onRetry = { viewModel.onEvent(CharacterDetailsEvent.LoadCharacter(characterId)) }
             )
 
@@ -72,8 +72,6 @@ fun CharacterDetailsScreen(
                     modifier = Modifier.padding(paddingValues)
                 )
             }
-
-            is ResultState.Idle -> {}
         }
     }
 }

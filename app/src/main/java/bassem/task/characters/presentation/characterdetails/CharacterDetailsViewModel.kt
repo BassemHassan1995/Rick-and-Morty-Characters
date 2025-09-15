@@ -36,10 +36,7 @@ class CharacterDetailsViewModel @Inject constructor(
                 } else {
                     setState {
                         copy(
-                            characterDetailState = ResultState.Error(
-                                "Character not found",
-                                Exception("Character with ID $characterId not found")
-                            )
+                            characterDetailState = ResultState.Error()
                         )
                     }
                 }
@@ -47,8 +44,7 @@ class CharacterDetailsViewModel @Inject constructor(
                 setState {
                     copy(
                         characterDetailState = ResultState.Error(
-                            throwable.message ?: "Unknown error",
-                            throwable
+                            throwable.message
                         )
                     )
                 }
