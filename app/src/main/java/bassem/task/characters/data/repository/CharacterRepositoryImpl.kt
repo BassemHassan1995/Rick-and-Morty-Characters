@@ -60,18 +60,20 @@ class CharacterRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getCharacterById(id: Int): Character? {
-        // First try to get from cache
         return try {
-            val character = dao.getCharacterById(id)
-            character?.toDomain() ?: // If not in cache, try API
-            api.getCharacterById(id).toDomain()
-        } catch (e: Exception) {
+            // First try to get from cache, if fails (null) try API
+            dao.getCharacterById(id)?.toDomain() ?: getCharacterFromApi(id)
+        } catch (_: Exception) {
             // If cache fails, try API
-            try {
-                api.getCharacterById(id).toDomain()
-            } catch (apiException: Exception) {
-                null
-            }
+            getCharacterFromApi(id)
+        }
+    }
+
+    private suspend fun getCharacterFromApi(id: Int): Character? {
+        return try {
+            api.getCharacterById(id).toDomain()
+        } catch (_: Exception) {
+            null
         }
     }
 
