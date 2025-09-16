@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">Characters Application</string>
+    <string name="app_name">Rick &amp; Morty</string>
     <string name="character_status_alive">Alive</string>
     <string name="character_status_dead">Dead</string>
     <string name="character_status_unknown">Unknown</string>
-    <string name="characters_title">Characters</string>
+    <string name="characters_title">Rick &amp; Morty Characters</string>
     <string name="character_details_title">Character Details</string>
 
     <!-- CommonViews strings -->
@@ -23,6 +23,9 @@
     <string name="try_again_later">Try again later or check your connection.</string>
     <string name="unknown_error">Unknown error occurred</string>
     <string name="error_loading_more">Error loading more characters</string>
+
+    <!-- CharacterDetailsScreen strings -->
+    <string name="character_not_found">Character not found</string>
 
     <!-- Search strings -->
     <string name="search_characters_placeholder">Search characters…</string>
