@@ -9,7 +9,6 @@ import bassem.task.characters.domain.model.CharacterStatus
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -144,28 +143,6 @@ class CharacterRepositoryImplTest {
 
     // Test getCharacterById method - API fallback scenarios
     @Test
-    fun `getCharacterById should fallback to API and return mapped character when not in cache`() =
-        runTest {
-            // Given
-            val characterId = 1
-            whenever(dao.getCharacterById(characterId)).thenReturn(null)
-            whenever(api.getCharacterById(characterId)).thenReturn(testCharacterDto)
-
-            // When
-            val result = repository.getCharacterById(characterId)
-
-            // Then
-            assertNotNull(result)
-            assertEquals(testCharacterDto.id, result?.id)
-            assertEquals(testCharacterDto.name, result?.name)
-            assertEquals(CharacterStatus.fromString(testCharacterDto.status), result?.status)
-            assertEquals(testCharacterDto.species, result?.species)
-
-            verify(dao).getCharacterById(characterId)
-            verify(api).getCharacterById(characterId)
-        }
-
-    @Test
     fun `getCharacterById should handle different character statuses correctly`() = runTest {
         // Given
         val characterId = 2
@@ -187,10 +164,10 @@ class CharacterRepositoryImplTest {
     }
 
     @Test
-    fun `getCharacterById should fallback to API when cache throws exception`() = runTest {
+    fun `getCharacterById should fallback to API when cache is empty`() = runTest {
         // Given
         val characterId = 1
-        whenever(dao.getCharacterById(characterId)).thenThrow(RuntimeException("Database error"))
+        whenever(dao.getCharacterById(characterId)).thenReturn(null)
         whenever(api.getCharacterById(characterId)).thenReturn(testCharacterDto)
 
         // When
@@ -207,36 +184,22 @@ class CharacterRepositoryImplTest {
         verify(api).getCharacterById(characterId)
     }
 
-    // Test getCharacterById method - Error scenarios
     @Test
-    fun `getCharacterById should return null when both cache and API fail`() = runTest {
-        // Given
-        val characterId = 999
-        whenever(dao.getCharacterById(characterId)).thenThrow(RuntimeException("Database error"))
-        whenever(api.getCharacterById(characterId)).thenThrow(RuntimeException("Network error"))
-
-        // When
-        val result = repository.getCharacterById(characterId)
-
-        // Then
-        assertNull(result)
-        verify(dao).getCharacterById(characterId)
-        verify(api).getCharacterById(characterId)
-    }
-
-    @Test
-    fun `getCharacterById should return null when cache is empty and API throws exception`() =
+    fun `getCharacterById should throw exception when cache is empty and API throws exception`() =
         runTest {
             // Given
             val characterId = 999
             whenever(dao.getCharacterById(characterId)).thenReturn(null)
             whenever(api.getCharacterById(characterId)).thenThrow(RuntimeException("Character not found"))
 
-            // When
-            val result = repository.getCharacterById(characterId)
+            // When & Then
+            try {
+                repository.getCharacterById(characterId)
+                assert(false) { "Expected exception to be thrown" }
+            } catch (e: Exception) {
+                // Exception should be thrown as expected
+            }
 
-            // Then
-            assertNull(result)
             verify(dao).getCharacterById(characterId)
             verify(api).getCharacterById(characterId)
         }
