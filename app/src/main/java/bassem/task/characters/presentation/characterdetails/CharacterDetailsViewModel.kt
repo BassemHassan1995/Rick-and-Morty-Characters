@@ -3,7 +3,6 @@ package bassem.task.characters.presentation.characterdetails
 import bassem.task.characters.domain.usecase.GetCharacterByIdUseCase
 import bassem.task.characters.presentation.base.BaseViewModel
 import androidx.lifecycle.viewModelScope
-import bassem.task.characters.presentation.base.ResultState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,28 +23,23 @@ class CharacterDetailsViewModel @Inject constructor(
     private fun loadCharacter(characterId: Int) {
         viewModelScope.launch {
             setState {
-                copy(characterDetailState = ResultState.Loading)
+                copy(isLoading = true, error = null)
             }
 
             try {
                 val character = getCharacterByIdUseCase(characterId)
-                if (character != null) {
-                    setState {
-                        copy(characterDetailState = ResultState.Success(character))
-                    }
-                } else {
-                    setState {
-                        copy(
-                            characterDetailState = ResultState.Error()
-                        )
-                    }
+                setState {
+                    copy(
+                        character = character,
+                        isLoading = false,
+                        error = if (character != null) null else CharacterDetailsError.CharacterNotFound,
+                    )
                 }
             } catch (throwable: Throwable) {
                 setState {
                     copy(
-                        characterDetailState = ResultState.Error(
-                            throwable.message
-                        )
+                        isLoading = false,
+                        error = CharacterDetailsError.GeneralError(throwable.message)
                     )
                 }
             }

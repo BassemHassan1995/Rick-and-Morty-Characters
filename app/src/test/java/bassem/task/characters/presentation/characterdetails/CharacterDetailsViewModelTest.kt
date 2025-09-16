@@ -1,11 +1,9 @@
 package bassem.task.characters.presentation.characterdetails
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import app.cash.turbine.test
 import bassem.task.characters.domain.model.Character
 import bassem.task.characters.domain.model.CharacterStatus
 import bassem.task.characters.domain.usecase.GetCharacterByIdUseCase
-import bassem.task.characters.presentation.base.ResultState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -48,12 +46,14 @@ class CharacterDetailsViewModelTest {
     }
 
     @Test
-    fun `initial state should be loading`() {
+    fun `initial state should have default values`() {
         // When
         val state = viewModel.state.value
 
         // Then
-        assertTrue(state.characterDetailState is ResultState.Loading)
+        assertNull(state.character)
+        assertFalse(state.isLoading)
+        assertNull(state.error)
     }
 
     @Test
@@ -65,19 +65,13 @@ class CharacterDetailsViewModelTest {
 
             // When
             viewModel.onEvent(CharacterDetailsEvent.LoadCharacter(characterId))
+            testDispatcher.scheduler.advanceUntilIdle()
 
             // Then
-            viewModel.state.test {
-                val loadingState = awaitItem()
-                assertTrue(loadingState.characterDetailState is ResultState.Loading)
-
-                val successState = awaitItem()
-                assertTrue(successState.characterDetailState is ResultState.Success)
-                assertEquals(
-                    testCharacter,
-                    (successState.characterDetailState as ResultState.Success).data
-                )
-            }
+            val finalState = viewModel.state.value
+            assertFalse(finalState.isLoading)
+            assertEquals(testCharacter, finalState.character)
+            assertNull(finalState.error)
         }
 
     @Test
@@ -89,15 +83,13 @@ class CharacterDetailsViewModelTest {
 
             // When
             viewModel.onEvent(CharacterDetailsEvent.LoadCharacter(characterId))
+            testDispatcher.scheduler.advanceUntilIdle()
 
             // Then
-            viewModel.state.test {
-                val loadingState = awaitItem()
-                assertTrue(loadingState.characterDetailState is ResultState.Loading)
-
-                val errorState = awaitItem()
-                assertTrue(errorState.characterDetailState is ResultState.Error)
-            }
+            val finalState = viewModel.state.value
+            assertFalse(finalState.isLoading)
+            assertNull(finalState.character)
+            assertEquals(CharacterDetailsError.CharacterNotFound, finalState.error)
         }
 
     @Test
@@ -110,19 +102,13 @@ class CharacterDetailsViewModelTest {
 
             // When
             viewModel.onEvent(CharacterDetailsEvent.LoadCharacter(characterId))
+            testDispatcher.scheduler.advanceUntilIdle()
 
             // Then
-            viewModel.state.test {
-                val loadingState = awaitItem()
-                assertTrue(loadingState.characterDetailState is ResultState.Loading)
-
-                val errorState = awaitItem()
-                assertTrue(errorState.characterDetailState is ResultState.Error)
-                assertEquals(
-                    errorMessage,
-                    (errorState.characterDetailState as ResultState.Error).message
-                )
-            }
+            val finalState = viewModel.state.value
+            assertFalse(finalState.isLoading)
+            assertEquals(CharacterDetailsError.GeneralError(errorMessage), finalState.error)
+            assertNull(finalState.character)
         }
 
     @Test
@@ -134,18 +120,15 @@ class CharacterDetailsViewModelTest {
 
         // When
         viewModel.onEvent(CharacterDetailsEvent.LoadCharacter(characterId))
+        testDispatcher.scheduler.advanceUntilIdle()
 
         // Then
-        viewModel.state.test {
-            val loadingState = awaitItem()
-            assertTrue(loadingState.characterDetailState is ResultState.Loading)
-
-            val successState = awaitItem()
-            assertTrue(successState.characterDetailState is ResultState.Success)
-            val resultCharacter = (successState.characterDetailState as ResultState.Success).data
-            assertEquals(characterId, resultCharacter.id)
-            assertEquals("Morty Smith", resultCharacter.name)
-        }
+        val finalState = viewModel.state.value
+        assertFalse(finalState.isLoading)
+        assertEquals(character, finalState.character)
+        assertEquals(characterId, finalState.character?.id)
+        assertEquals("Morty Smith", finalState.character?.name)
+        assertNull(finalState.error)
     }
 
     @Test
@@ -156,15 +139,12 @@ class CharacterDetailsViewModelTest {
 
         // When
         viewModel.onEvent(CharacterDetailsEvent.LoadCharacter(characterId))
+        testDispatcher.scheduler.advanceUntilIdle()
 
         // Then
-        viewModel.state.test {
-            val loadingState = awaitItem()
-            assertTrue(loadingState.characterDetailState is ResultState.Loading)
-
-            val errorState = awaitItem()
-            assertTrue(errorState.characterDetailState is ResultState.Error)
-            assertNull((errorState.characterDetailState as ResultState.Error).message)
-        }
+        val finalState = viewModel.state.value
+        assertFalse(finalState.isLoading)
+        assertEquals(CharacterDetailsError.GeneralError(null), finalState.error)
+        assertNull(finalState.character)
     }
 }

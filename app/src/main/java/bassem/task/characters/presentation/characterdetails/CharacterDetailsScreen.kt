@@ -27,7 +27,6 @@ import bassem.task.characters.domain.model.CharacterStatus
 import bassem.task.characters.ui.components.ErrorView
 import bassem.task.characters.ui.components.LoadingView
 import bassem.task.characters.ui.components.BaseScaffold
-import bassem.task.characters.presentation.base.ResultState
 import coil.compose.rememberAsyncImagePainter
 
 @Composable
@@ -59,16 +58,23 @@ fun CharacterDetailsScreen(
         showBackButton = true,
         onBackClick = onNavigateBack
     ) { paddingValues ->
-        when (val result = state.characterDetailState) {
-            is ResultState.Loading -> LoadingView()
-            is ResultState.Error -> ErrorView(
-                message = result.message ?: stringResource(id = R.string.character_not_found),
-                onRetry = { viewModel.onEvent(CharacterDetailsEvent.LoadCharacter(characterId)) }
-            )
+        when {
+            state.isLoading -> LoadingView()
+            state.error != null -> {
+                val errorMessage = when (val errorState = state.error!!) {
+                    is CharacterDetailsError.CharacterNotFound -> stringResource(R.string.character_not_found)
+                    is CharacterDetailsError.GeneralError -> errorState.message
+                        ?: stringResource(R.string.unknown_error)
+                }
+                ErrorView(
+                    message = errorMessage,
+                    onRetry = { viewModel.onEvent(CharacterDetailsEvent.LoadCharacter(characterId)) }
+                )
+            }
 
-            is ResultState.Success -> {
+            state.character != null -> {
                 CharacterDetailsContent(
-                    character = result.data,
+                    character = state.character!!,
                     modifier = Modifier.padding(paddingValues)
                 )
             }
