@@ -19,6 +19,5 @@ sealed interface CharacterListEvent : ViewEvent {
 
 // ---------- Effects ----------
 sealed interface CharacterListEffect : ViewEffect {
-    data class ShowError(val message: String) : CharacterListEffect
     data class NavigateToCharacterDetail(val id: Int) : CharacterListEffect
 }
