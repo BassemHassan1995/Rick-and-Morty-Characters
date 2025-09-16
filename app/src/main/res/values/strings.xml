@@ -25,7 +25,7 @@
     <string name="error_loading_more">Error loading more characters</string>
 
     <!-- CharacterDetailsScreen strings -->
-    <string name="character_not_found">Character not found</string>
+    <string name="character_not_found">Character not found. Try another name</string>
 
     <!-- Search strings -->
     <string name="search_characters_placeholder">Search characters…</string>

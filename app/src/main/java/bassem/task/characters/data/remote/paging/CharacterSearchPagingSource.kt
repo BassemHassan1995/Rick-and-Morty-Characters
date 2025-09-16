@@ -4,7 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import bassem.task.characters.data.remote.api.CharacterApiService
 import bassem.task.characters.data.remote.dto.CharacterDto
-import retrofit2.HttpException
+import bassem.task.characters.data.remote.utils.toApiException
 import javax.inject.Inject
 
 class CharacterSearchPagingSource @Inject constructor(
@@ -29,19 +29,8 @@ class CharacterSearchPagingSource @Inject constructor(
                 prevKey = prevKey,
                 nextKey = nextKey
             )
-        } catch (exception: HttpException) {
-            if (exception.code() == 404) {
-                // No results found for the search query
-                LoadResult.Page(
-                    data = emptyList(),
-                    prevKey = null,
-                    nextKey = null
-                )
-            } else {
-                LoadResult.Error(exception)
-            }
         } catch (e: Exception) {
-            LoadResult.Error(e)
+            LoadResult.Error(e.toApiException())
         }
     }
 

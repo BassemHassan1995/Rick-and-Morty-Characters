@@ -10,6 +10,7 @@ import bassem.task.characters.data.mapper.toDomain
 import bassem.task.characters.data.mediator.CharacterRemoteMediator
 import bassem.task.characters.data.remote.api.CharacterApiService
 import bassem.task.characters.data.remote.paging.CharacterSearchPagingSource
+import bassem.task.characters.data.remote.utils.toApiException
 import bassem.task.characters.domain.model.Character
 import bassem.task.characters.domain.repository.CharacterRepository
 import kotlinx.coroutines.flow.Flow
@@ -60,20 +61,17 @@ class CharacterRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getCharacterById(id: Int): Character? {
-        return try {
-            // First try to get from cache, if fails (null) try API
-            dao.getCharacterById(id)?.toDomain() ?: getCharacterFromApi(id)
-        } catch (_: Exception) {
-            // If cache fails, try API
-            getCharacterFromApi(id)
-        }
+        // First try DB
+        val local = dao.getCharacterById(id)
+        // Only call API if DB is empty
+        return local?.toDomain() ?: getCharacterFromApi(id)
     }
 
     private suspend fun getCharacterFromApi(id: Int): Character? {
         return try {
             api.getCharacterById(id).toDomain()
-        } catch (_: Exception) {
-            null
+        } catch (e: Exception) {
+            throw e.toApiException()
         }
     }
 
