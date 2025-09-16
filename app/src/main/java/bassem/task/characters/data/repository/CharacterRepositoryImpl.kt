@@ -26,7 +26,7 @@ class CharacterRepositoryImpl @Inject constructor(
     companion object {
         private const val PAGE_SIZE = 20
         private const val PREFETCH_DISTANCE = 5
-        private const val INITIAL_LOAD_SIZE = 40
+        private const val INITIAL_LOAD_SIZE = PAGE_SIZE
 
         val pagingConfig = PagingConfig(
             pageSize = PAGE_SIZE,

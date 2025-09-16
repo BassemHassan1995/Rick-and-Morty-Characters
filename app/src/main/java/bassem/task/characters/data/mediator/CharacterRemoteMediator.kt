@@ -2,7 +2,6 @@ package bassem.task.characters.data.mediator
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
-import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
@@ -20,18 +19,11 @@ class CharacterRemoteMediator @Inject constructor(
 ) : RemoteMediator<Int, CharacterEntity>() {
 
     override suspend fun initialize(): InitializeAction {
-        // Check if we have cached data
         return try {
-            val loadResult = database.characterDao().getCharacters().load(
-                PagingSource.LoadParams.Refresh(
-                    key = null,
-                    loadSize = 1,
-                    placeholdersEnabled = false
-                )
-            )
+            // Check if we have any cached characters, skip refresh
+            val cachedCount = database.characterDao().getCharacterCount()
 
-            // If we have cached data, skip initial refresh
-            if (loadResult is PagingSource.LoadResult.Page && loadResult.data.isNotEmpty()) {
+            if (cachedCount > 0) {
                 InitializeAction.SKIP_INITIAL_REFRESH
             } else {
                 InitializeAction.LAUNCH_INITIAL_REFRESH
@@ -51,16 +43,11 @@ class CharacterRemoteMediator @Inject constructor(
             LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
             LoadType.APPEND -> {
                 val lastItem = state.lastItemOrNull()
-                if (lastItem == null) {
-                    return MediatorResult.Success(endOfPaginationReached = true)
-                }
+                    ?: database.characterDao().getLastCharacter()
+                    ?: return MediatorResult.Success(endOfPaginationReached = true)
 
                 val remoteKey = database.remoteKeysDao().remoteKeysCharacterId(lastItem.id)
-                if (remoteKey?.nextPage == null) {
-                    return MediatorResult.Success(endOfPaginationReached = true)
-                }
-
-                remoteKey.nextPage
+                remoteKey?.nextPage ?: return MediatorResult.Success(endOfPaginationReached = true)
             }
         }
 

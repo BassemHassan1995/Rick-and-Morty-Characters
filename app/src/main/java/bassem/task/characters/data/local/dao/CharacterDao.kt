@@ -22,6 +22,12 @@ interface CharacterDao {
     @Query("SELECT * FROM characters WHERE id = :id")
     suspend fun getCharacterById(id: Int): CharacterEntity?
 
+    @Query("SELECT COUNT(*) FROM characters")
+    suspend fun getCharacterCount(): Int
+
+    @Query("SELECT * FROM characters ORDER BY id DESC LIMIT 1")
+    suspend fun getLastCharacter(): CharacterEntity?
+
     @Query("DELETE FROM characters")
     suspend fun clearAll()
 }
