@@ -24,7 +24,10 @@ fun BaseScaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = title)
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleLarge
+                    )
                 },
                 navigationIcon = {
                     if (showBackButton && onBackClick != null) {
