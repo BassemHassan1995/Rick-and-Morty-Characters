@@ -1,6 +1,6 @@
 # Rick and Morty Characters App
 
-A modern Android application built with **Kotlin** and **Jetpack Compose** that displays characters from the [Rick and Morty API](https://rickandmortyapi.com/). The app demonstrates **Clean Architecture**, **MVI with UDF (Unidirectional Data Flow)**, **offline-first approach** with **Room caching**, **Paging 3**, and **Hilt dependency injection**.
+A modern Android application built with **Kotlin** and **Jetpack Compose** that displays characters from the [Rick and Morty API](https://rickandmortyapi.com/). The app demonstrates **Clean Architecture**, **UDF (Unidirectional Data Flow)**, **offline-first approach** with **Room caching**, **Paging 3**, and **Hilt dependency injection**.
 
 ---
 
@@ -44,7 +44,7 @@ bassem.task.characters/
 │   ├── repository/ # Repository interfaces
 │   └── usecase/    # Business use cases
 │
-├── presentation/   # UI layer with MVI + UDF
+├── presentation/   # UI layer with UDF
 │   ├── base/       # Base ViewModel and common UI components
 │   ├── characterlist/    # Character list screen
 │   └── characterdetails/ # Character details screen
@@ -70,7 +70,7 @@ bassem.task.characters/
 - `usecase/` → Business logic encapsulation (e.g., `GetCharactersUseCase`, `GetCharacterByIdUseCase`)
 
 **Presentation Layer:**
-- Each feature follows MVI with UDF pattern
+- Implements **Unidirectional Data Flow (UDF)** pattern  
 - `State` → Immutable UI state representation
 - `Event` → User interactions and system events
 - `Effect` → One-time UI effects (navigation, snackbars)
@@ -124,7 +124,7 @@ The app implements a sophisticated caching strategy using **Room** and **Paging 
 **Core Technologies:**
 - **Language:** Kotlin 2.2.20
 - **UI Framework:** Jetpack Compose (BOM 2025.09.00)
-- **Architecture:** Clean Architecture + MVI + UDF
+- **Architecture:** Clean Architecture + UDF
 - **Minimum SDK:** 24 (Android 7.0)
 - **Target SDK:** 36
 
@@ -160,8 +160,7 @@ The app implements a sophisticated caching strategy using **Room** and **Paging 
 
 1. **Clone the repository:**
    ```bash
-   git clone <repository-url>
-   cd rick-and-morty-characters
+   git clone https://github.com/BassemHassan1995/Rick-and-Morty-Characters.git
    ```
 
 2. **Open in Android Studio:**
@@ -209,10 +208,10 @@ The app implements a sophisticated caching strategy using **Room** and **Paging 
 - Makes the codebase scalable and adaptable to changing requirements
 - Enables easy mocking and unit testing
 
-### 2. **MVI + UDF Pattern**
-**Choice:** Combined MVI with Unidirectional Data Flow
+### 2. **Unidirectional Data Flow (UDF) Pattern**
+**Choice:** Used UDF for predictable state management
 **Rationale:**
-- MVI provides clear separation between UI and business logic
+- Clear separation between UI and business logic
 - UDF ensures predictable state management and easier debugging
 - Reactive programming with Flows provides real-time UI updates
 - Excellent integration with Jetpack Compose
