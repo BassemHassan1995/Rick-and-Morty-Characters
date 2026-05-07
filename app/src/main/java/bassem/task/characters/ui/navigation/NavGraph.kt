@@ -11,10 +11,13 @@ import androidx.navigation.NavType
 import bassem.task.characters.presentation.characterlist.CharacterListScreen
 import bassem.task.characters.presentation.characterdetails.CharacterDetailsScreen
 import bassem.task.characters.presentation.characterdetails.CharacterDetailsViewModel
+import bassem.task.characters.presentation.favoritelist.FavoriteListScreen
+import bassem.task.characters.presentation.favoritelist.FavoriteListViewModel
 
 object Destinations {
     const val CHARACTER_LIST = "character_list"
     const val CHARACTER_DETAIL_WITH_ID = "character_detail/{characterId}"
+    const val FAVORITE_LIST = "favorite_list"
 
     fun characterDetail(characterId: Int) = "character_detail/$characterId"
 }
@@ -34,6 +37,22 @@ fun AppNavGraph(
                 viewModel = viewModel,
                 onCharacterClick = { characterId ->
                     navController.navigate(Destinations.characterDetail(characterId))
+                },
+                onFavoritesClick = {
+                    navController.navigate(Destinations.FAVORITE_LIST)
+                }
+            )
+        }
+
+        composable(Destinations.FAVORITE_LIST) {
+            val viewModel: FavoriteListViewModel = hiltViewModel()
+            FavoriteListScreen(
+                viewModel = viewModel,
+                onCharacterClick = { characterId ->
+                    navController.navigate(Destinations.characterDetail(characterId))
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
                 }
             )
         }

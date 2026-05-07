@@ -16,6 +16,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -47,7 +53,8 @@ import coil.compose.rememberAsyncImagePainter
 @Composable
 fun CharacterListScreen(
     viewModel: CharacterListViewModel = hiltViewModel(),
-    onCharacterClick: (Int) -> Unit
+    onCharacterClick: (Int) -> Unit,
+    onFavoritesClick: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     val characters = viewModel.characters.collectAsLazyPagingItems()
@@ -59,12 +66,25 @@ fun CharacterListScreen(
                 is CharacterListEffect.NavigateToCharacterDetail -> {
                     onCharacterClick(effect.id)
                 }
+
+                CharacterListEffect.NavigateToFavorites -> {
+                    onFavoritesClick()
+                }
             }
         }
     }
 
     BaseScaffold(
         title = stringResource(R.string.characters_title),
+        actions = {
+            IconButton(onClick = { viewModel.onEvent(CharacterListEvent.OnFavoritesClicked) }) {
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = stringResource(R.string.action_favorites),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -123,6 +143,9 @@ fun CharacterListScreen(
                             onCharacterClick = { id ->
                                 viewModel.onEvent(CharacterListEvent.OnCharacterClicked(id))
                             },
+                            onFavoriteToggle = { id ->
+                                viewModel.onEvent(CharacterListEvent.OnFavoriteToggle(id))
+                            },
                             modifier = Modifier
                         )
                     }
@@ -136,6 +159,7 @@ fun CharacterListScreen(
 fun CharactersListContent(
     characters: LazyPagingItems<Character>,
     onCharacterClick: (Int) -> Unit,
+    onFavoriteToggle: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -148,7 +172,8 @@ fun CharactersListContent(
             if (character != null) {
                 CharacterItem(
                     character = character,
-                    onCharacterClick = onCharacterClick
+                    onCharacterClick = onCharacterClick,
+                    onFavoriteToggle = onFavoriteToggle
                 )
             }
         }
@@ -193,7 +218,8 @@ fun CharactersListContent(
 @Composable
 fun CharacterItem(
     character: Character,
-    onCharacterClick: (Int) -> Unit
+    onCharacterClick: (Int) -> Unit,
+    onFavoriteToggle: (Int) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -239,6 +265,15 @@ fun CharacterItem(
                     text = character.species,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            // Favorite Toggle
+            IconButton(onClick = { onFavoriteToggle(character.id) }) {
+                Icon(
+                    imageVector = if (character.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = stringResource(R.string.action_favorite),
+                    tint = if (character.isFavorite) Color.Red else MaterialTheme.colorScheme.outline
                 )
             }
         }

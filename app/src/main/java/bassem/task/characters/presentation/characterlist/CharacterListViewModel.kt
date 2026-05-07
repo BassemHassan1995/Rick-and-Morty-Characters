@@ -5,8 +5,10 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import bassem.task.characters.domain.model.Character
 import bassem.task.characters.domain.usecase.GetCharactersUseCase
+import bassem.task.characters.domain.usecase.ToggleFavoriteUseCase
 import bassem.task.characters.presentation.base.BaseViewModel
 import bassem.task.characters.presentation.characterlist.CharacterListEffect.NavigateToCharacterDetail
+import bassem.task.characters.presentation.characterlist.CharacterListEffect.NavigateToFavorites
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -16,11 +18,13 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CharacterListViewModel @Inject constructor(
     private val getCharactersUseCase: GetCharactersUseCase,
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase
 ) : BaseViewModel<CharacterListEvent, CharacterListState, CharacterListEffect>(
     CharacterListState()
 ) {
@@ -47,6 +51,16 @@ class CharacterListViewModel @Inject constructor(
             is CharacterListEvent.OnSearchQueryChanged -> {
                 setState { copy(searchQuery = event.query) }
                 searchQueryFlow.tryEmit(event.query)
+            }
+
+            is CharacterListEvent.OnFavoriteToggle -> {
+                viewModelScope.launch {
+                    toggleFavoriteUseCase(event.id)
+                }
+            }
+
+            CharacterListEvent.OnFavoritesClicked -> {
+                sendEffect { NavigateToFavorites }
             }
         }
     }

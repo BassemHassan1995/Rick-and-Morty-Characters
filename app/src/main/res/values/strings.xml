@@ -33,4 +33,11 @@
     <string name="try_different_search">Try a different name</string>
     <string name="clear_search">Clear search</string>
     <string name="search">Search</string>
+
+    <!-- Favorites strings -->
+    <string name="favorites_title">Favorite Characters</string>
+    <string name="no_favorites_found">No favorites yet</string>
+    <string name="add_favorites_description">Your favorite characters will appear here.</string>
+    <string name="action_favorites">Favorites</string>
+    <string name="action_favorite">Add to favorites</string>
 </resources>

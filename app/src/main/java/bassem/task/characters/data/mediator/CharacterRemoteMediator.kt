@@ -6,7 +6,7 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import bassem.task.characters.data.local.AppDatabase
-import bassem.task.characters.data.local.entity.CharacterEntity
+import bassem.task.characters.data.local.entity.CharacterEntityWithFavorite
 import bassem.task.characters.data.local.entity.RemoteKeyEntity
 import bassem.task.characters.data.mapper.toEntity
 import bassem.task.characters.data.remote.api.CharacterApiService
@@ -16,7 +16,7 @@ import javax.inject.Inject
 class CharacterRemoteMediator @Inject constructor(
     private val api: CharacterApiService,
     private val database: AppDatabase
-) : RemoteMediator<Int, CharacterEntity>() {
+) : RemoteMediator<Int, CharacterEntityWithFavorite>() {
 
     override suspend fun initialize(): InitializeAction {
         return try {
@@ -36,17 +36,17 @@ class CharacterRemoteMediator @Inject constructor(
 
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, CharacterEntity>
+        state: PagingState<Int, CharacterEntityWithFavorite>
     ): MediatorResult {
         val page = when (loadType) {
             LoadType.REFRESH -> 1
             LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
             LoadType.APPEND -> {
                 val lastItem = state.lastItemOrNull()
-                    ?: database.characterDao().getLastCharacter()
+                    ?: database.characterDao().getLastCharacter()?.let { CharacterEntityWithFavorite(it, false) }
                     ?: return MediatorResult.Success(endOfPaginationReached = true)
 
-                val remoteKey = database.remoteKeysDao().remoteKeysCharacterId(lastItem.id)
+                val remoteKey = database.remoteKeysDao().remoteKeysCharacterId(lastItem.character.id)
                 remoteKey?.nextPage ?: return MediatorResult.Success(endOfPaginationReached = true)
             }
         }

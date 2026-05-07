@@ -8,12 +8,16 @@ import bassem.task.characters.data.local.entity.CharacterEntity
 import bassem.task.characters.data.local.dao.RemoteKeysDao
 import bassem.task.characters.data.local.entity.RemoteKeyEntity
 
+import bassem.task.characters.data.local.dao.FavoriteDao
+import bassem.task.characters.data.local.entity.FavoriteEntity
+
 @Database(
-    entities = [CharacterEntity::class, RemoteKeyEntity::class],
-    version = 1,
+    entities = [CharacterEntity::class, RemoteKeyEntity::class, FavoriteEntity::class],
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun characterDao(): CharacterDao
     abstract fun remoteKeysDao(): RemoteKeysDao
+    abstract fun favoriteDao(): FavoriteDao
 }

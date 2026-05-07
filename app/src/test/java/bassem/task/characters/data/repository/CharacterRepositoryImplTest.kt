@@ -1,11 +1,13 @@
 package bassem.task.characters.data.repository
 
 import bassem.task.characters.data.local.dao.CharacterDao
+import bassem.task.characters.data.local.dao.FavoriteDao
 import bassem.task.characters.data.local.entity.CharacterEntity
 import bassem.task.characters.data.mediator.CharacterRemoteMediator
 import bassem.task.characters.data.remote.api.CharacterApiService
 import bassem.task.characters.data.remote.dto.CharacterDto
 import bassem.task.characters.domain.model.CharacterStatus
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -13,6 +15,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -24,6 +27,9 @@ class CharacterRepositoryImplTest {
 
     @Mock
     private lateinit var dao: CharacterDao
+
+    @Mock
+    private lateinit var favoriteDao: FavoriteDao
 
     @Mock
     private lateinit var remoteMediator: CharacterRemoteMediator
@@ -62,7 +68,9 @@ class CharacterRepositoryImplTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        repository = CharacterRepositoryImpl(api, dao, remoteMediator)
+        whenever(favoriteDao.getFavoriteIds()).thenReturn(flowOf(emptyList()))
+        whenever(favoriteDao.isFavorite(any())).thenReturn(flowOf(false))
+        repository = CharacterRepositoryImpl(api, dao, favoriteDao, remoteMediator)
     }
 
     // Test getCharacters method

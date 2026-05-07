@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.paging.PagingData
 import app.cash.turbine.test
 import bassem.task.characters.domain.usecase.GetCharactersUseCase
+import bassem.task.characters.domain.usecase.ToggleFavoriteUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -18,6 +19,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -31,6 +33,9 @@ class CharacterListViewModelTest {
     @Mock
     private lateinit var getCharactersUseCase: GetCharactersUseCase
 
+    @Mock
+    private lateinit var toggleFavoriteUseCase: ToggleFavoriteUseCase
+
     private lateinit var viewModel: CharacterListViewModel
 
     @Before
@@ -39,9 +44,9 @@ class CharacterListViewModelTest {
         Dispatchers.setMain(testDispatcher)
 
         // Setup default mock behavior
-        whenever(getCharactersUseCase("")).thenReturn(flowOf(PagingData.empty()))
+        whenever(getCharactersUseCase(any())).thenReturn(flowOf(PagingData.empty()))
 
-        viewModel = CharacterListViewModel(getCharactersUseCase)
+        viewModel = CharacterListViewModel(getCharactersUseCase, toggleFavoriteUseCase)
     }
 
     @Test

@@ -4,8 +4,11 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import bassem.task.characters.domain.model.Character
 import bassem.task.characters.domain.model.CharacterStatus
 import bassem.task.characters.domain.usecase.GetCharacterByIdUseCase
+import bassem.task.characters.domain.usecase.IsCharacterFavoriteUseCase
+import bassem.task.characters.domain.usecase.ToggleFavoriteUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -15,6 +18,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -27,6 +31,12 @@ class CharacterDetailsViewModelTest {
 
     @Mock
     private lateinit var getCharacterByIdUseCase: GetCharacterByIdUseCase
+
+    @Mock
+    private lateinit var isCharacterFavoriteUseCase: IsCharacterFavoriteUseCase
+
+    @Mock
+    private lateinit var toggleFavoriteUseCase: ToggleFavoriteUseCase
 
     private lateinit var viewModel: CharacterDetailsViewModel
 
@@ -42,7 +52,12 @@ class CharacterDetailsViewModelTest {
     fun setUp() {
         MockitoAnnotations.openMocks(this)
         Dispatchers.setMain(testDispatcher)
-        viewModel = CharacterDetailsViewModel(getCharacterByIdUseCase)
+        whenever(isCharacterFavoriteUseCase(any())).thenReturn(flowOf(false))
+        viewModel = CharacterDetailsViewModel(
+            getCharacterByIdUseCase,
+            isCharacterFavoriteUseCase,
+            toggleFavoriteUseCase
+        )
     }
 
     @Test

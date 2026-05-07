@@ -9,4 +9,10 @@ interface CharacterRepository {
     fun getCharacters(name: String? = null): Flow<PagingData<Character>>
 
     suspend fun getCharacterById(id: Int): Character?
+
+    suspend fun toggleFavorite(characterId: Int)
+
+    fun isFavorite(id: Int): Flow<Boolean>
+
+    fun getFavoriteCharacters(): Flow<PagingData<Character>>
 }

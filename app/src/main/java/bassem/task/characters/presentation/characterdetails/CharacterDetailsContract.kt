@@ -8,6 +8,7 @@ import bassem.task.characters.domain.model.Character
 // State
 data class CharacterDetailsState(
     val character: Character? = null,
+    val isFavorite: Boolean = false,
     val isLoading: Boolean = false,
     val error: CharacterDetailsError? = null
 ) : ViewState
@@ -20,6 +21,7 @@ sealed class CharacterDetailsError {
 // Events (what the user triggers / screen inputs)
 sealed interface CharacterDetailsEvent : ViewEvent {
     data class LoadCharacter(val characterId: Int) : CharacterDetailsEvent
+    object OnFavoriteToggle : CharacterDetailsEvent
 }
 
 sealed interface CharacterDetailsEffect : ViewEffect {

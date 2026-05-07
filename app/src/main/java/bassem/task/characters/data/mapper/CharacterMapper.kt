@@ -6,13 +6,14 @@ import bassem.task.characters.domain.model.Character
 import bassem.task.characters.domain.model.CharacterStatus
 
 // Convert from API DTO to Domain Model
-fun CharacterDto.toDomain(): Character {
+fun CharacterDto.toDomain(isFavorite: Boolean = false): Character {
     return Character(
         id = id,
         name = name,
         status = CharacterStatus.fromString(status),
         species = species,
-        image = image
+        image = image,
+        isFavorite = isFavorite
     )
 }
 
@@ -29,12 +30,13 @@ fun CharacterDto.toEntity(page: Int): CharacterEntity {
 }
 
 // Convert from Entity to Domain Model
-fun CharacterEntity.toDomain(): Character {
+fun CharacterEntity.toDomain(isFavorite: Boolean = false): Character {
     return Character(
         id = id,
         name = name,
         status = CharacterStatus.fromString(status),
         species = species,
-        image = image
+        image = image,
+        isFavorite = isFavorite
     )
 }

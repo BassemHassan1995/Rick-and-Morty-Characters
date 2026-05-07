@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -55,7 +58,16 @@ fun CharacterDetailsScreen(
     BaseScaffold(
         title = stringResource(R.string.character_details_title),
         showBackButton = true,
-        onBackClick = onNavigateBack
+        onBackClick = onNavigateBack,
+        actions = {
+            IconButton(onClick = { viewModel.onEvent(CharacterDetailsEvent.OnFavoriteToggle) }) {
+                Icon(
+                    imageVector = if (state.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = stringResource(R.string.action_favorite),
+                    tint = if (state.isFavorite) Color.Red else MaterialTheme.colorScheme.primary
+                )
+            }
+        }
     ) { paddingValues ->
         when {
             state.isLoading -> LoadingView()

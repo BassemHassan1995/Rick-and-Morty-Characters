@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import bassem.task.characters.data.local.entity.CharacterEntity
+import bassem.task.characters.data.local.entity.CharacterEntityWithFavorite
 
 @Dao
 interface CharacterDao {
@@ -19,8 +20,18 @@ interface CharacterDao {
     @Query("SELECT * FROM characters")
     fun getCharacters(): PagingSource<Int, CharacterEntity>
 
+    @Query("""
+        SELECT characters.*, favorites.id IS NOT NULL as isFavorite 
+        FROM characters 
+        LEFT JOIN favorites ON characters.id = favorites.id
+    """)
+    fun getCharactersWithFavorite(): PagingSource<Int, CharacterEntityWithFavorite>
+
     @Query("SELECT * FROM characters WHERE id = :id")
     suspend fun getCharacterById(id: Int): CharacterEntity?
+
+    @Query("SELECT * FROM characters INNER JOIN favorites ON characters.id = favorites.id")
+    fun getFavoriteCharacters(): PagingSource<Int, CharacterEntity>
 
     @Query("SELECT COUNT(*) FROM characters")
     suspend fun getCharacterCount(): Int

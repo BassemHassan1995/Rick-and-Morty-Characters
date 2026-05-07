@@ -1,6 +1,7 @@
 package bassem.task.characters.ui.components
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -16,6 +17,7 @@ fun BaseScaffold(
     title: String,
     showBackButton: Boolean = false,
     onBackClick: (() -> Unit)? = null,
+    actions: @Composable RowScope.() -> Unit = {},
     snackbarHost: @Composable () -> Unit = {},
     content: @Composable (paddingValues: PaddingValues) -> Unit
 ) {
@@ -38,7 +40,8 @@ fun BaseScaffold(
                             )
                         }
                     }
-                }
+                },
+                actions = actions
             )
         },
         snackbarHost = snackbarHost

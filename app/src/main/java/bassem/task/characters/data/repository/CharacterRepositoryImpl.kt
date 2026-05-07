@@ -6,6 +6,9 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import bassem.task.characters.data.local.dao.CharacterDao
+import bassem.task.characters.data.local.dao.FavoriteDao
+import bassem.task.characters.data.local.entity.CharacterEntityWithFavorite
+import bassem.task.characters.data.local.entity.FavoriteEntity
 import bassem.task.characters.data.mapper.toDomain
 import bassem.task.characters.data.mediator.CharacterRemoteMediator
 import bassem.task.characters.data.remote.api.CharacterApiService
@@ -14,6 +17,7 @@ import bassem.task.characters.data.remote.utils.toApiException
 import bassem.task.characters.domain.model.Character
 import bassem.task.characters.domain.repository.CharacterRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -21,6 +25,7 @@ import javax.inject.Inject
 class CharacterRepositoryImpl @Inject constructor(
     private val api: CharacterApiService,
     private val dao: CharacterDao,
+    private val favoriteDao: FavoriteDao,
     private val remoteMediator: CharacterRemoteMediator
 ) : CharacterRepository {
 
@@ -39,37 +44,61 @@ class CharacterRepositoryImpl @Inject constructor(
 
     override fun getCharacters(name: String?): Flow<PagingData<Character>> {
         return if (name.isNullOrBlank()) {
-            val pagingSourceFactory = { dao.getCharacters() }
+            val pagingSourceFactory = { dao.getCharactersWithFavorite() }
             Pager(
                 config = pagingConfig,
                 remoteMediator = remoteMediator,
                 pagingSourceFactory = pagingSourceFactory
             ).flow
                 .map { pagingData ->
-                    pagingData.map { entity -> entity.toDomain() }
+                    pagingData.map { entityWithFavorite ->
+                        entityWithFavorite.character.toDomain(isFavorite = entityWithFavorite.isFavorite)
+                    }
                 }
         } else {
-            val pagingSourceFactory = { CharacterSearchPagingSource(api, name) }
+            val pagingSourceFactory = { CharacterSearchPagingSource(api, favoriteDao, name) }
             Pager(
                 config = pagingConfig,
                 pagingSourceFactory = pagingSourceFactory
             ).flow
-                .map { pagingData ->
-                    pagingData.map { dto -> dto.toDomain() }
-                }
         }
     }
 
     override suspend fun getCharacterById(id: Int): Character? {
         // First try DB
         val local = dao.getCharacterById(id)
+        val isFavorite = favoriteDao.isFavorite(id).first()
         // Only call API if DB is empty
-        return local?.toDomain() ?: getCharacterFromApi(id)
+        return local?.toDomain(isFavorite) ?: getCharacterFromApi(id, isFavorite)
     }
 
-    private suspend fun getCharacterFromApi(id: Int): Character? {
+    override suspend fun toggleFavorite(characterId: Int) {
+        val isFav = favoriteDao.isFavorite(characterId).first()
+        if (isFav) {
+            favoriteDao.deleteFavorite(characterId)
+        } else {
+            favoriteDao.insertFavorite(FavoriteEntity(characterId))
+        }
+    }
+
+    override fun isFavorite(id: Int): Flow<Boolean> {
+        return favoriteDao.isFavorite(id)
+    }
+
+    override fun getFavoriteCharacters(): Flow<PagingData<Character>> {
+        val pagingSourceFactory = { dao.getFavoriteCharacters() }
+        return Pager(
+            config = pagingConfig,
+            pagingSourceFactory = pagingSourceFactory
+        ).flow
+            .map { pagingData ->
+                pagingData.map { entity -> entity.toDomain(isFavorite = true) }
+            }
+    }
+
+    private suspend fun getCharacterFromApi(id: Int, isFavorite: Boolean): Character? {
         return try {
-            api.getCharacterById(id).toDomain()
+            api.getCharacterById(id).toDomain(isFavorite)
         } catch (e: Exception) {
             throw e.toApiException()
         }
