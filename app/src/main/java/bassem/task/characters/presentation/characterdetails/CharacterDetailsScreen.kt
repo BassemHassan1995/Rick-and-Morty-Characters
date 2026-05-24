@@ -19,7 +19,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import bassem.task.characters.R
 import bassem.task.characters.domain.model.Character
 import bassem.task.characters.domain.model.CharacterStatus
@@ -31,7 +30,7 @@ import coil.compose.rememberAsyncImagePainter
 @Composable
 fun CharacterDetailsScreen(
     characterId: Int,
-    viewModel: CharacterDetailsViewModel = hiltViewModel(),
+    viewModel: CharacterDetailsViewModel,
     onNavigateBack: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()

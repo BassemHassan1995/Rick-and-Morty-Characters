@@ -31,7 +31,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -46,7 +45,7 @@ import coil.compose.rememberAsyncImagePainter
 
 @Composable
 fun CharacterListScreen(
-    viewModel: CharacterListViewModel = hiltViewModel(),
+    viewModel: CharacterListViewModel,
     onCharacterClick: (Int) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
