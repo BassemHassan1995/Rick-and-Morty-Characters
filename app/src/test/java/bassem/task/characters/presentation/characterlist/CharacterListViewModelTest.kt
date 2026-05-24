@@ -92,11 +92,11 @@ class CharacterListViewModelTest {
         // Given
         val characterId = 42
 
-        // When
-        viewModel.onEvent(CharacterListEvent.OnCharacterClicked(characterId))
-
-        // Then
         viewModel.effect.test {
+            // When
+            viewModel.onEvent(CharacterListEvent.OnCharacterClicked(characterId))
+
+            // Then
             val effect = awaitItem()
             assertTrue(effect is CharacterListEffect.NavigateToCharacterDetail)
             assertEquals(characterId, (effect as CharacterListEffect.NavigateToCharacterDetail).id)
