@@ -32,9 +32,9 @@ app/src/main/java/bassem/task/characters/
 Every screen defines a `*Contract.kt` file with three sealed types, all extending base interfaces from `presentation/base/ViewContracts.kt`:
 - `*State : ViewState` — immutable data class held in `StateFlow`
 - `*Event : ViewEvent` — sealed interface for user/system actions
-- `*Effect : ViewEffect` — one-time events (navigation, snackbars) sent via `Channel`
+- `*Effect : ViewEffect` — one-time events (navigation, snackbars) emitted via `SharedFlow`
 
-All ViewModels extend `BaseViewModel<Event, State, Effect>` and implement `onEvent(event)`. Update state via `setState { copy(...) }` and fire effects via `sendEffect { ... }`.
+All ViewModels extend `BaseViewModel<Event, State, Effect>` and implement `onEvent(event)`. Update state via `setState { copy(...) }` and fire effects via `sendEffect { ... }`. The base implementation uses a collector-aware `SharedFlow` for effects, so screens should start collecting `effect` as soon as they enter composition.
 
 ## Two Paging Strategies
 | Mode | Implementation | Cache |

@@ -73,7 +73,7 @@ bassem.task.characters/
 - Implements **Unidirectional Data Flow (UDF)** pattern  
 - `State` → Immutable UI state representation
 - `Event` → User interactions and system events
-- `Effect` → One-time UI effects (navigation, snackbars)
+- `Effect` → One-time UI effects (navigation, snackbars) emitted via `SharedFlow`
 - `ViewModel` → State management and business logic coordination
 
 **DI Layer:**
@@ -95,7 +95,7 @@ User Action → Event → ViewModel → UseCase → Repository → Data Source (
 **Flow:**
 - `Event` → Represents user interactions and system actions
 - `State` → Immutable snapshot of UI state
-- `Effect` → One-time events (navigation, notifications)
+- `Effect` → One-time events (navigation, notifications) delivered through `SharedFlow`
 - `ViewModel` → Processes events and emits new states
 
 ---
