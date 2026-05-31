@@ -4,7 +4,7 @@ A modern Android application built with **Kotlin** and **Jetpack Compose** that 
 
 ---
 
-## 📱 Features
+##  Features
 
 - **Character List Screen**
   - Displays a paginated list of characters (20 per page) with infinite scrolling
@@ -25,7 +25,7 @@ A modern Android application built with **Kotlin** and **Jetpack Compose** that 
 
 ---
 
-## 🏗️ Architecture
+## ️ Architecture
 
 This app follows **Clean Architecture** principles with clear separation of concerns across 3 main layers:
 
@@ -82,7 +82,7 @@ bassem.task.characters/
 
 ---
 
-## 🔄 UDF (Unidirectional Data Flow) Pattern
+##  UDF (Unidirectional Data Flow) Pattern
 
 The presentation layer implements a robust UDF pattern:
 
@@ -100,7 +100,7 @@ User Action → Event → ViewModel → UseCase → Repository → Data Source (
 
 ---
 
-## 🗄️ Offline-First Caching Strategy
+## ️ Offline-First Caching Strategy
 
 The app implements a sophisticated caching strategy using **Room** and **Paging 3 RemoteMediator**:
 
@@ -119,7 +119,7 @@ The app implements a sophisticated caching strategy using **Room** and **Paging 
 
 ---
 
-## 🛠️ Tech Stack
+## ️ Tech Stack
 
 **Core Technologies:**
 - **Language:** Kotlin 2.2.20
@@ -149,7 +149,7 @@ The app implements a sophisticated caching strategy using **Room** and **Paging 
 
 ---
 
-## 🚀 Building and Running the Application
+##  Building and Running the Application
 
 ### Prerequisites
 - **Android Studio:** Arctic Fox or newer
@@ -198,7 +198,7 @@ The app implements a sophisticated caching strategy using **Room** and **Paging 
 
 ---
 
-## 🏛️ Architectural Choices
+## ️ Architectural Choices
 
 ### 1. **Clean Architecture**
 **Choice:** Implemented Clean Architecture with clear layer separation
@@ -242,7 +242,7 @@ The app implements a sophisticated caching strategy using **Room** and **Paging 
 
 ---
 
-## 🤔 Assumptions and Key Decisions
+##  Assumptions and Key Decisions
 
 ### Technical Decisions
 
@@ -296,7 +296,7 @@ The app implements a sophisticated caching strategy using **Room** and **Paging 
 
 ---
 
-## 📝 API Information
+##  API Information
 
 - **Base URL:** `https://rickandmortyapi.com/api/`
 - **Endpoints Used:**
@@ -306,7 +306,7 @@ The app implements a sophisticated caching strategy using **Room** and **Paging 
 
 ---
 
-## 🔄 Current Status
+##  Current Status
 
 The application successfully addresses all requirements:
 - ✅ Character list with pagination
